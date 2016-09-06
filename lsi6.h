@@ -22,7 +22,7 @@ typedef struct {
 } lsi6_channel;
 
 struct lsi6_dev {
-    long pciaddr;
+    phys_addr_t pciaddr;
     char *base;
     int irq;
     int card;
