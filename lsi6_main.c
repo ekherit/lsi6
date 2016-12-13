@@ -270,7 +270,7 @@ static int lsi6_open(struct inode * inode, struct file * file)
 static long lsi6_ioctl(struct file *file,
 			unsigned int cmd, unsigned long arg)
 {
-	struct inode *inode = file->f_dentry->d_inode;
+	struct inode *inode = file->f_path.dentry->d_inode;
 	int chnum = MINOR(inode->i_rdev);
 	unsigned long * ptr = (unsigned long * ) arg;
 	unsigned long x;
@@ -429,11 +429,11 @@ static int lsi6_ioctl_locked(struct inode *inode, struct file *file,
 static ssize_t lsi6_read(struct file * file, char * buf,
 			   size_t count, loff_t *ppos)
 {
-	unsigned int chnum=MINOR(file->f_dentry->d_inode->i_rdev);
+	unsigned int chnum=MINOR(file->f_path.dentry->d_inode->i_rdev);
 	int naf = *ppos;
 	int n,a,f, rc;
 	unsigned long x;
-	unsigned int card = get_device_no(MAJOR(file->f_dentry->d_inode->i_rdev));
+	unsigned int card = get_device_no(MAJOR(file->f_path.dentry->d_inode->i_rdev));
 	lsi6_dev_t *lsi;
 	lsi6_channel * channel;
 
@@ -498,11 +498,11 @@ static ssize_t lsi6_read(struct file * file, char * buf,
 static ssize_t lsi6_write(struct file * file, const char * buf,
 				size_t count, loff_t *ppos)
 {
-	unsigned int chnum=MINOR(file->f_dentry->d_inode->i_rdev);
+	unsigned int chnum=MINOR(file->f_path.dentry->d_inode->i_rdev);
 	int naf = *ppos;
 	int n,a,f, rc;
 	unsigned long x;
-	unsigned int card = get_device_no(MAJOR(file->f_dentry->d_inode->i_rdev));
+	unsigned int card = get_device_no(MAJOR(file->f_path.dentry->d_inode->i_rdev));
 	lsi6_dev_t *lsi;
 	lsi6_channel * channel;
 	if (card < 0)
@@ -586,10 +586,10 @@ static int lsi6_release(struct inode * inode, struct file * file)
 }
 
 unsigned int poll(struct file *filp, struct poll_table_struct *wait) {
-	unsigned int chnum=MINOR(filp->f_dentry->d_inode->i_rdev);
+	unsigned int chnum=MINOR(filp->f_path.dentry->d_inode->i_rdev);
 	int n = N_NAF(filp->f_pos);
 	int group = n/3;
-	unsigned int card = get_device_no(MAJOR(filp->f_dentry->d_inode->i_rdev));
+	unsigned int card = get_device_no(MAJOR(filp->f_path.dentry->d_inode->i_rdev));
 	lsi6_dev_t *lsi = &lsi6_dev[card];
 	lsi6_channel * channel = &lsi->channels[chnum];
 	if (card < 0 || card >= LSI6_NUMCARDS || chnum < 0 || chnum >= LSI6_NUMCHANNELS || n < 0 || n > 23) {
@@ -689,14 +689,14 @@ static int lsi6_init_one (struct pci_dev *pdev,
 	lsi->pciaddr, lsi->irq));
 
 	if (request_mem_region (lsi->pciaddr, LSI6_WINDOW_SIZE, DRV_NAME) == NULL) {
-	printk (KERN_ERR DRV_NAME ": I/O resource 0x%x @ 0x%lx busy\n",
+	printk (KERN_ERR DRV_NAME ": I/O resource 0x%x @ 0x%llx busy\n",
 		LSI6_WINDOW_SIZE, lsi->pciaddr);
 	return -EBUSY;
 	}
 
 	lsi->base = ioremap_nocache(lsi->pciaddr, LSI6_WINDOW_SIZE);
 	if (!lsi->base) {
-	printk(KERN_ERR DRV_NAME ": Can't map 0x%x @ 0x%lx\n",
+	printk(KERN_ERR DRV_NAME ": Can't map 0x%x @ 0x%llx\n",
 		LSI6_WINDOW_SIZE, lsi->pciaddr);
 	goto error_with_release;
 	}
