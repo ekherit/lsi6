@@ -138,6 +138,7 @@ static irqreturn_t lsi6_interrupt(int irq, void *dev_id, struct pt_regs *unused)
 	return (irqreturn_t)IRQ_HANDLED;
 }
 
+#ifdef DEBUG
 //Returns 1 if channel isvalid, 0 otherwise
 static int isValidChannel(lsi6_channel * channel) {
 	int rv = 0, i, k;
@@ -161,6 +162,7 @@ static int isValidChannel(lsi6_channel * channel) {
 	}
 	return 1;
 }
+#endif
 
 //Reads LAM requests from crate and wakes waiting threads.
 //Scheduled by lsi6_interrupt
@@ -267,6 +269,7 @@ static int lsi6_open(struct inode * inode, struct file * file)
 	return 0;
 }
 
+#ifdef HAVE_UNLOCKED_IOCTL
 static long lsi6_ioctl(struct file *file,
 			unsigned int cmd, unsigned long arg)
 {
@@ -420,11 +423,13 @@ static long lsi6_ioctl(struct file *file,
 	}
 	return 0;
 }
-
+#else
 static int lsi6_ioctl_locked(struct inode *inode, struct file *file,
 			unsigned int cmd, unsigned long arg) {
 	return lsi6_ioctl(file, cmd, arg);
 }
+#endif
+
 
 static ssize_t lsi6_read(struct file * file, char * buf,
 			   size_t count, loff_t *ppos)
@@ -694,7 +699,8 @@ static int lsi6_init_one (struct pci_dev *pdev,
 	return -EBUSY;
 	}
 
-	lsi->base = ioremap_nocache(lsi->pciaddr, LSI6_WINDOW_SIZE);
+	//lsi->base = ioremap_nocache(lsi->pciaddr, LSI6_WINDOW_SIZE);
+	lsi->base = ioremap_cache(lsi->pciaddr, LSI6_WINDOW_SIZE);
 	if (!lsi->base) {
 	printk(KERN_ERR DRV_NAME ": Can't map 0x%x @ 0x%llx\n",
 		LSI6_WINDOW_SIZE, lsi->pciaddr);

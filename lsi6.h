@@ -10,6 +10,10 @@
 typedef struct wait_queue *wait_queue_head_t;
 #endif
 
+#if LINUX_VERSION_CODE > KERNEL_VERSION(5,10,0)
+#define HAVE_UNLOCKED_IOCTL
+#endif
+
 struct lsi6_dev;
 
 typedef struct {
