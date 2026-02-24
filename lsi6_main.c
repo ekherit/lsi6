@@ -590,7 +590,7 @@ static int lsi6_release(struct inode * inode, struct file * file)
 	return 0;
 }
 
-unsigned int poll(struct file *filp, struct poll_table_struct *wait) {
+static unsigned int poll(struct file *filp, struct poll_table_struct *wait) {
 	unsigned int chnum=MINOR(filp->f_path.dentry->d_inode->i_rdev);
 	int n = N_NAF(filp->f_pos);
 	int group = n/3;
@@ -790,7 +790,11 @@ static struct pci_driver lsi6_driver = {
 static int __init lsi6_init(void)
 {
 	printk(version);
+#if LINUX_VERSION_CODE < KERNEL_VERSION(6,4,0)
 	lsi6_class = class_create(THIS_MODULE, DRV_NAME);
+#else
+	lsi6_class = class_create(DRV_NAME);
+#endif
 	return pci_register_driver(&lsi6_driver);
 }
 

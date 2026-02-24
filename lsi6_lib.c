@@ -20,6 +20,7 @@
 #include "k0607.h"
 #include "lsi6.h"
 #include "lsi6camac.h"
+#include "lsi6_lib.h"
 
 
 //#define DEBUG
