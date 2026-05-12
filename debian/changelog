@@ -1,3 +1,9 @@
+lsi6-dkms (1.09) UNRELEASED; urgency=medium
+
+  * Fixed compilation errors for Linxu kernel 6.12 (Debian 13)
+
+ -- Ivan Nikolaev <I.B.Nikolaev@inp.nsk.su>  Tue, 12 May 2026 20:13:44 +0700
+
 lsi6-dkms (1.08) unstable; urgency=low
 
   * Fixed LAM handling bug caused by improper flag reset.
